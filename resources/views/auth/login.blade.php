@@ -56,7 +56,7 @@
                     @enderror
 
                     <input type="submit" value="Se connecter"
-                        class="text-lg mt-8 px-1.5 py-1 rounded placeholder-gray-700">
+                        class="text-lg mt-8 px-1.5 py-1 cursor-pointer rounded placeholder-gray-700">
                 </form>
             </div>
         </div>

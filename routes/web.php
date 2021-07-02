@@ -12,6 +12,7 @@ use Illuminate\Support\Facades\Route;
 | contains the "web" middleware group. Now create something great!
 |
 */
+
 Route::middleware(['guest'])->group(function () {
     Route::get('/login', 'Auth\LoginController@index')->name('login');
     Route::post('/login', 'Auth\LoginController@login')->name('login.post');
@@ -25,9 +26,12 @@ Route::middleware(['guest'])->group(function () {
 Route::middleware(['auth'])->group(function () {
     Route::get('/home', 'MainController@index')->name('home');
 
+    Route::post('/light/1/{id}', 'MainController@lightOn')->name('light.on');
+    Route::post('/light/0/{id}', 'MainController@lightOff')->name('light.off');
+
     Route::redirect('/', '/home');
 
-    Route::get('/logout', function(){
+    Route::get('/logout', function () {
         Auth::logout();
 
         return redirect()->route('login');

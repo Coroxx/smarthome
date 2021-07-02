@@ -30,4 +30,9 @@ class User extends Authenticatable
         'remember_token',
     ];
 
+
+    public function devices(){
+        return $this->hasMany('App\Models\Device');
+    }
+
 }

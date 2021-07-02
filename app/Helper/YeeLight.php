@@ -2,16 +2,20 @@
 
 namespace app\Helper;
 
-class Yeelight {
+
+class Yeelight
+{
 	private $jobs = array();
 
-	public function __construct($ip, $port) {
+	public function __construct($ip, $port)
+	{
 		$this->ip = $ip;
 		$this->port = $port;
 		if (!$this->verifyConnection()) throw new Exception("Failed connecting to Yeelight device.");
 	}
 
-	private function verifyConnection() {
+	private function verifyConnection()
+	{
 		$this->fp = fsockopen($this->ip, $this->port, $this->errno, $this->errstr, 30);
 		if (!$this->fp) return false;
 
@@ -19,13 +23,15 @@ class Yeelight {
 		return true;
 	}
 
-	private function getNextID() {
-		if(!empty($this->jobs)) return count($this->jobs);
+	private function getNextID()
+	{
+		if (!empty($this->jobs)) return count($this->jobs);
 		else return 0;
 	}
 
-	public function __call($method, $args) {
-		$jObj = new stdClass;
+	public function __call($method, $args)
+	{
+		$jObj = new \stdClass();
 		$jObj->id = $this->getNextID();
 		$jObj->method = $method;
 		$jObj->params = $args;
@@ -34,9 +40,10 @@ class Yeelight {
 		return $this;
 	}
 
-	public function commit() {
+	public function commit()
+	{
 		if (!$this->verifyConnection()) throw new Exception("Failed connecting to Yeelight device.");
-		foreach($this->jobs as $job) {
+		foreach ($this->jobs as $job) {
 			$jStr = json_encode($job);
 			fwrite($this->fp, $jStr . "\r\n");
 			fflush($this->fp);
@@ -47,11 +54,12 @@ class Yeelight {
 		}
 
 		$this->jobs = array();
-		if(!empty($out)) return $out;
+		if (!empty($out)) return $out;
 		else return true;
 	}
 
-	public function disconnect() {
+	public function disconnect()
+	{
 		fclose($this->fp);
 	}
 }
