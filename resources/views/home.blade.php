@@ -140,7 +140,7 @@ use App\Models\Device;
                         <div class="pl-2.5 mt-2 w-full mb-12">
                             <label class="flex items-center cursor-pointer">
                                 <div class="relative">
-                                    <input type="checkbox" data-id="{{ $device->id }}" @if ($device->type == 'yeelight') onclick="toggleLight(this)" @elseif($device->type == 'daikin') onclick="togglePower(this)" @endif data-ip="{{ $device->ip }}" class="sr-only" @if ($device->status)
+                                    <input type="checkbox" data-id="{{ $device->id }}" @if ($device->type == 'yeelight') onclick="toggleLight(this)" @elseif($device->type == 'daikin') onclick="togglePower(this)" @endif class="sr-only" @if ($device->status)
                                     @if ($device->status === 'on')
                                     checked @endif @else disabled
                 @endif />
@@ -258,59 +258,60 @@ use App\Models\Device;
         function togglePower(e) {
             // e.disabled = true;
 
+            document.getElementById(e.dataset.id + 'Box').classList.replace(e.checked ? 'circle-red' : 'circle-green', e
+                .checked ? 'circle-green' : 'circle-red')
 
-            if (e.checked) {
-                document.getElementById(e.dataset.id + 'Box').classList.replace('circle-red', 'circle-green')
-            } else {
-                document.getElementById(e.dataset.id + 'Box').classList.replace('circle-green', 'circle-red')
-            }
+            // var xmlhttp = new XMLHttpRequest();
+            // xmlhttp.onreadystatechange = function() {
+            //     if (xmlhttp.readyState == 4) {
+            //         if (xmlhttp.status == 200) {
+            //             var response = JSON.parse(xmlhttp.responseText);
+            //             console.log('good!');
+            //             control_response = response;
+            //             control_response_handler(response);
+            //         }
+            //     }
+            // };
 
-            var xmlhttp = new XMLHttpRequest();
-            xmlhttp.onreadystatechange = function() {
-                if (xmlhttp.readyState == 4) {
-                    if (xmlhttp.status == 200) {
-                        var response = JSON.parse(xmlhttp.responseText);
-                        console.log('good!');
-                        control_response = response;
-                        control_response_handler(response);
-                    }
-                }
-            };
-            xmlhttp.open("GET", `http://${e.dataset.ip}/aircon/get_control_info`, true);
-            xmlhttp.setRequestHeader("Content-type", "application/json");
+            // xmlhttp.open("GET", `http://${e.dataset.ip}/aircon/get_control_info`, true);
+            // xmlhttp.setRequestHeader("Content-type", "application/json");
 
-            xmlhttp.send();
+            window.axios.post('http://smarthome.localhost/daikin/' + e.dataset.id + '/power').then(
+                (r) => {
+                    console.log(r.data);
+                })
 
+            // console.log(control_response);
 
+            // xmlhttp.send();
 
+            // request = "POST";
+            // target = `/daikin/power/${e.dataset.ip}`;
+            // console.log(e.dataset.po);
+            // console.log(JSON.parse(e.dataset.po));
+            // let temp = minimize_opt(e.dataset.po);
+            // temp.pow == "0" ? 1 : 0;
 
-            request = "POST";
-            target = `/daikin/power/${e.dataset.ip}`;
-            console.log(e.dataset.po);
-            console.log(JSON.parse(e.dataset.po));
-            let temp = minimize_opt(e.dataset.po);
-            temp.pow == "0" ? 1 : 0;
+            // console.log(temp);
 
-            console.log(temp);
-
-            var xmlhttp = new XMLHttpRequest();
-            xmlhttp.onreadystatechange = function() {
-                if (xmlhttp.readyState == 4) {
-                    if (xmlhttp.status == 200) {
-                        var response = JSON.parse(xmlhttp.responseText);
-                        console.log(response);
-                    } else {
-                        console.log("Error: send control request failed");
-                    }
-                } else {
-                    //alert(xmlhttp.readyState);
-                }
-            };
+            // var xmlhttp = new XMLHttpRequest();
+            // xmlhttp.onreadystatechange = function() {
+            //     if (xmlhttp.readyState == 4) {
+            //         if (xmlhttp.status == 200) {
+            //             var response = JSON.parse(xmlhttp.responseText);
+            //             console.log(response);
+            //         } else {
+            //             console.log("Error: send control request failed");
+            //         }
+            //     } else {
+            //         //alert(xmlhttp.readyState);
+            //     }
+            // };
 
 
-            xmlhttp.open(request, target, true);
-            xmlhttp.setRequestHeader("Content-type", "application/json");
-            xmlhttp.send(JSON.stringify(temp));
+            // xmlhttp.open(request, target, true);
+            // xmlhttp.setRequestHeader("Content-type", "application/json");
+            // xmlhttp.send(JSON.stringify(temp));
         }
     </script>
 </body>

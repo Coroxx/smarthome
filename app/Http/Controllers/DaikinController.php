@@ -2,7 +2,8 @@
 
 namespace App\Http\Controllers;
 
-use Illuminate\Http\Request;
+use App\Models\Device;
+use Illuminate\Support\Facades\Http;
 
 class DaikinController extends Controller
 {
@@ -58,5 +59,21 @@ class DaikinController extends Controller
         // // dd($aRequest);
         // $json_ret = set_array_info("/aircon/set_control_info", '192.168.0.21', $aRequest);
         // dd($json_ret);
+    }
+
+    public function togglePower(Device $device)
+    {
+        $response = Http::get('http://' . $device->ip . '/aircon/get_control_info');
+
+        $data = explode(",", $response->body());
+        $control_info = [];
+        foreach ($data as $val) {
+            $pair = explode("=", $val);
+            $control_info[$pair[0]] = $pair[1];
+        }
+
+        $control_info['pow'] = $control_info['pow'] == 1 ? 0 : 1;
+
+        Http::get('http://' . $device->ip . '/aircon/set_control_info', $control_info);
     }
 }
