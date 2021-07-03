@@ -26,8 +26,13 @@ Route::middleware(['guest'])->group(function () {
 Route::middleware(['auth'])->group(function () {
     Route::get('/home', 'MainController@index')->name('home');
 
+    Route::get('/daikin', 'DaikinController@index');
+
     Route::post('/light/1/{id}', 'MainController@lightOn')->name('light.on');
     Route::post('/light/0/{id}', 'MainController@lightOff')->name('light.off');
+
+    Route::post('/luminosity/{luminosity}/{id}', 'MainController@luminosity');
+    Route::post('/color/{color}/{id}', 'MainController@color');
 
     Route::redirect('/', '/home');
 

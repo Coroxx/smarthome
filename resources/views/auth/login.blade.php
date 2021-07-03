@@ -27,15 +27,15 @@
 <body>
 
 
-    <div class="bg-gradient-to-t from-yellow-200 to-yellow-500 w-full h-screen">
-        <p class="text-gray-200 font-default text-center text-4xl py-2 font-extrabold ">SmartHome <span
+    <div class="w-full h-screen bg-gray-900">
+        <p class="py-2 text-4xl font-extrabold text-center text-gray-200 font-default ">SmartHome <span
                 class="text-3xl relative bottom-0.5">🏡</span>
             -
             Connexion</p>
         <div id="login">
-            <div class="h-auto w-1/3 m-auto mt-12 rounded text-center">
+            <div class="w-1/3 h-auto m-auto mt-12 text-center rounded">
                 <div class="py-1 text-3xl">
-                    <p class="font-default text-white font-bold ">Identifiants</p>
+                    <p class="font-bold text-white font-default ">Identifiants</p>
                 </div>
                 <form action="{{ route('login.post') }}" method="POST">
                     @csrf

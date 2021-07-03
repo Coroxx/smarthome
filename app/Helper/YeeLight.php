@@ -3,63 +3,70 @@
 namespace app\Helper;
 
 
+
+
 class Yeelight
 {
-	private $jobs = array();
+    private $jobs = array();
 
-	public function __construct($ip, $port)
-	{
-		$this->ip = $ip;
-		$this->port = $port;
-		if (!$this->verifyConnection()) throw new Exception("Failed connecting to Yeelight device.");
-	}
+    public function __construct($ip, $port)
+    {
+        $this->ip = $ip;
+        $this->port = $port;
+        if (!$this->verifyConnection()) return false;
+    }
 
-	private function verifyConnection()
-	{
-		$this->fp = fsockopen($this->ip, $this->port, $this->errno, $this->errstr, 30);
-		if (!$this->fp) return false;
+    private function verifyConnection()
+    {
+        try {
+            $this->fp = fsockopen($this->ip, $this->port, $this->errno, $this->errstr, 10);
+        } catch (\Throwable $th) {
+            return false;
+        }
 
-		stream_set_blocking($this->fp, false);
-		return true;
-	}
+        // if (!$this->fp) return false;
 
-	private function getNextID()
-	{
-		if (!empty($this->jobs)) return count($this->jobs);
-		else return 0;
-	}
+        stream_set_blocking($this->fp, false);
+        return true;
+    }
 
-	public function __call($method, $args)
-	{
-		$jObj = new \stdClass();
-		$jObj->id = $this->getNextID();
-		$jObj->method = $method;
-		$jObj->params = $args;
+    private function getNextID()
+    {
+        if (!empty($this->jobs)) return count($this->jobs);
+        else return 0;
+    }
 
-		$this->jobs[] = $jObj;
-		return $this;
-	}
+    public function __call($method, $args)
+    {
+        $jObj = new \stdClass();
+        $jObj->id = $this->getNextID();
+        $jObj->method = $method;
+        $jObj->params = $args;
 
-	public function commit()
-	{
-		if (!$this->verifyConnection()) throw new Exception("Failed connecting to Yeelight device.");
-		foreach ($this->jobs as $job) {
-			$jStr = json_encode($job);
-			fwrite($this->fp, $jStr . "\r\n");
-			fflush($this->fp);
+        $this->jobs[] = $jObj;
+        return $this;
+    }
 
-			usleep(100 * 1000);
+    public function commit()
+    {
+        if (!$this->verifyConnection())  return false;
+        foreach ($this->jobs as $job) {
+            $jStr = json_encode($job);
+            fwrite($this->fp, $jStr . "\r\n");
+            fflush($this->fp);
 
-			$out[] = fgets($this->fp);
-		}
+            usleep(100 * 1000);
 
-		$this->jobs = array();
-		if (!empty($out)) return $out;
-		else return true;
-	}
+            $out[] = fgets($this->fp);
+        }
 
-	public function disconnect()
-	{
-		fclose($this->fp);
-	}
+        $this->jobs = array();
+        if (!empty($out)) return $out;
+        else return true;
+    }
+
+    public function disconnect()
+    {
+        fclose($this->fp);
+    }
 }
