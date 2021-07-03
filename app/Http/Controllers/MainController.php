@@ -24,11 +24,46 @@ class MainController extends Controller
                     $yee = new Yeelight($item->ip, 55443);
                     $status = $yee->get_prop("power")->commit();
                     if ($status) {
-                        $item->status = json_decode($status[0])->result[0];
+                        try {
+                            $item->status = json_decode($status[0])->result[0];
+                        } catch (\Throwable $th) {
+                        }
                         $bright = $yee->get_prop("bright")->commit();
                         $item->bright = json_decode($bright[0])->result[0];
                         $yee->disconnect();
                     }
+                    break;
+                case 'daikin':
+                    try {
+                        $data = file_get_contents('http://' . $item->ip . '/common/basic_info');
+                    } catch (\Throwable $th) {
+                        $item->status = False;
+
+                        return $item;
+                    }
+                    if (explode(',', $data)[6] == 'pow=0') {
+                        $item->status = 'off';
+                    } else if (explode(',', $data)[6] == 'pow=1') {
+                        $item->status = 'on';
+                    }
+
+                    $temp = file_get_contents('http://' . $item->ip . '/aircon/get_sensor_info');
+
+                    preg_match_all('!\d+!', explode(',', $temp)[1], $matches);
+                    $item->current_temp_indoor = $matches[0][0] . '.' . $matches[0][1] . '°C';
+                    preg_match_all('!\d+!', explode(',', $temp)[3], $matches);
+                    $item->current_temp_outside = $matches[0][0] . '.' . $matches[0][1] . '°C';
+
+
+                    // $control_info =  file_get_contents('http://' . $item->ip . '/aircon/get_control_info');
+
+                    // $array = explode(",", $control_info);
+                    // $control_info = array();
+                    // foreach ($array as $value) {
+                    //     $pair = explode("=", $value);
+                    //     $control_info[$pair[0]] = $pair[1];
+                    // }
+                    // $item->data = $control_info;
             }
             return $item;
         });
@@ -89,6 +124,36 @@ class MainController extends Controller
                 $yee->commit();
                 $yee->disconnect();
         }
+    }
+
+    public function clim($ip)
+    {
+        function set_array_info($uri, $aircon_ip, $parameters)
+        {
+            $url = "http://$aircon_ip$uri";
+            $context = stream_context_create(NULL, $parameters);
+            $data = file_get_contents($url . '?' . http_build_query($parameters));
+            if ($data === FALSE) {
+                return FALSE;
+            } else {
+                $array = explode(",", $data);
+                $control_info = array();
+                foreach ($array as $value) {
+                    $pair = explode("=", $value);
+                    $control_info[$pair[0]] = $pair[1];
+                }
+                return json_encode($control_info);
+            }
+        }
+
+        $aRequest = json_decode(file_get_contents('php://input'), true);
+        $json_ret = set_array_info("/aircon/set_control_info", $ip, $aRequest);
+        //request failed
+        if ($json_ret === FALSE) {
+            http_response_code(503); //service Unavailable
+            exit;
+        }
+        print($json_ret);
     }
 
     public function color($color, $id)

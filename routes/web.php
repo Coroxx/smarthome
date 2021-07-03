@@ -31,6 +31,9 @@ Route::middleware(['auth'])->group(function () {
     Route::post('/light/1/{id}', 'MainController@lightOn')->name('light.on');
     Route::post('/light/0/{id}', 'MainController@lightOff')->name('light.off');
 
+
+    Route::post('/daikin/power/{ip}', 'MainController@clim')->name('power.daikin');
+
     Route::post('/luminosity/{luminosity}/{id}', 'MainController@luminosity');
     Route::post('/color/{color}/{id}', 'MainController@color');
 

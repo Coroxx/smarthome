@@ -54,9 +54,9 @@ class DaikinController extends Controller
                 return json_encode($control_info);
             }
         }
-        $aRequest = json_decode(file_get_contents('php://input'), true);
-        // dd($aRequest);
-        $json_ret = set_array_info("/aircon/set_control_info", '192.168.0.21', $aRequest);
-        dd($json_ret);
+        // $aRequest = json_decode(file_get_contents('php://input'), true);
+        // // dd($aRequest);
+        // $json_ret = set_array_info("/aircon/set_control_info", '192.168.0.21', $aRequest);
+        // dd($json_ret);
     }
 }
