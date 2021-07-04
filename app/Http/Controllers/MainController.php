@@ -124,4 +124,11 @@ class MainController extends Controller
                 $yee->disconnect();
         }
     }
+
+    public function deleteDevice(Device $device)
+    {
+        $device->delete();
+
+        return redirect()->route('home');
+    }
 }

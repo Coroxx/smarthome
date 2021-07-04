@@ -33,8 +33,15 @@ class DaikinController extends Controller
     public function targetTemp(Device $device, $temp)
     {
         request()->validate([
-            $temp => 'regex:\d+[\.]?\d+'
+            $temp => 'regex:\d+[\.]?\d+',
         ]);
+
+        if (intval($temp) > 30) {
+            return abort(403);
+        } else if (intval($temp) < 25) {
+            return abort(403);
+        }
+
 
 
         $response = Http::get('http://' . $device->ip . '/aircon/get_control_info');
