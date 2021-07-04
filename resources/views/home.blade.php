@@ -8,6 +8,7 @@ use App\Models\Device;
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta http-equiv="refresh" content="200">
 
     <link href="{{ asset('css/app.css') }}" rel="stylesheet">
     <script src="{{ asset('js/app.js') }}"></script>
@@ -76,6 +77,32 @@ use App\Models\Device;
             }
         }
 
+        @keyframes notification {
+            0% {
+                display: block;
+                opacity: 0.1;
+            }
+
+            40% {
+                opacity: 0.7;
+            }
+
+            80% {
+                opacity: 1;
+            }
+
+            100% {
+                display: hidden;
+                opacity: 0;
+            }
+
+
+        }
+
+        .notification {
+            animation: notification 3s ease-in forwards;
+        }
+
     </style>
 </head>
 
@@ -92,17 +119,20 @@ use App\Models\Device;
     <div class="w-full h-screen bg-gray-900">
         <div class="fadeIn">
             <div class="">
-                <p class="py-4 text-3xl text-center text-gray-200 xl:text-5xl lg:text-4xl font-default">SmartHome <img
-                        src="{{ asset('assets/light.png') }}" alt="emoji" class="inline w-12 h-12 mb-1 -ml-2"></p>
+                <p class="py-4 text-3xl font-extrabold text-center text-gray-200 xl:text-5xl lg:text-4xl font-default">
+                    SmartHome <img src="{{ asset('assets/light.png') }}" alt="emoji"
+                        class="inline w-12 h-12 mb-1 -ml-2"></p>
             </div>
             <div class="mb-10">
                 <div class="px-1 py-1 m-auto text-center text-black bg-gray-300 rounded w-44">
                     <a href=""> Ajouter un appareil + </a>
                 </div>
             </div>
-            <div class="grid grid-cols-1 gap-12 mx-4 mt-4 text-center text-white xl:grid-cols-4 lg:grid-cols-2">
+            <div class="grid grid-cols-1 gap-12 mx-8 mt-4 text-center text-white xl:grid-cols-3 lg:grid-cols-2">
                 @foreach ($devices as $device)
-                    <div class="px-4 py-2 bg-gray-800 border-b-4 border-yellow-300 rounded">
+                    <div class="relative px-4 pt-2 bg-gray-800 border-b-4 @if ($device->type ==
+                    'yeelight') border-yellow-300 @elseif($device->type =='daikin')
+                        border-blue-500 @endif rounded">
                         <div class="text-left">
                             @switch($device->type)
                                 @case('yeelight')
@@ -113,7 +143,7 @@ use App\Models\Device;
                                     </svg>
                                 @break
                                 @case('daikin')
-                                    <svg xmlns="http://www.w3.org/2000/svg" class="inline-flex w-8 h-8" fill="none"
+                                    <svg xmlns="http://www.w3.org/2000/svg" class="inline-flex w-8 h-8 ml-2" fill="none"
                                         viewBox="0 0 24 24" stroke="currentColor">
                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                                             d="M13 10V3L4 14h7v7l9-11h-7z" />
@@ -131,6 +161,7 @@ use App\Models\Device;
                                     <div class="@if ($device->status == 'on') circle-green
                                     @else circle-red @endif" id="{{ $device->id . 'Box' }}"></div>
                                 </div>
+
                             @else
                                 <div>
                                     <p class="ml-2 font-bold text-red-600">Hors ligne</p>
@@ -174,27 +205,57 @@ use App\Models\Device;
                     </div>
                     <select name="color" data-id="{{ $device->id }}" onchange='color(this)'
                         class="px-2 bg-gray-600 rounded outline-none appearance-none focus:outline-none" id="color">
-                        <option value="16711680" selected>Rouge</option>
+                        <option selected>Sélectionner</option>
+                        <option value="16711680">Rouge</option>
                         <option value="65280">Vert</option>
                         <option value="255">Bleu</option>
                         <option value="10490623">Violet</option>
                         <option value="16187136">Jaune</option>
+                        <option value="16551939">Orange</option>
                     </select>
                 </div>
             @elseif ($device->type == 'daikin')
                 <br>
                 <div class="font-bold text-left">
+                    <div class="pb-4">
+                        <p class="inline">Température selectionnée : </p>
+                        <input type="text" maxlength="4" pattern="\d+[\.]?\d+"
+                            class="inline px-2 bg-gray-600 rounded py-0.5 focus:outline-none w-12"
+                            value='{{ $device->current_target_temp }}' id="{{ $device->id }}_current_temp"
+                            data-id="{{ $device->id }}"> °C
+                        <div class="inline" onclick="targetTemp('{{ $device->id }}_current_temp')">
+                            <svg xmlns="http://www.w3.org/2000/svg"
+                                class="inline cursor-pointer relative left-0.5 w-6 h-6" fill="none" viewBox="0 0 24 24"
+                                stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                    d="M5 13l4 4L19 7" />
+                            </svg>
+                        </div>
+                    </div>
+
                     <p>Température intérieure : {{ $device->current_temp_indoor }} </p>
                     <p>Température extérieure : {{ $device->current_temp_outside }} </p>
                 </div>
 
             @endif
 
+            <div class="absolute pt-1 bottom-3 right-3" onclick="deleteDevice(this)">
+                <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5 cursor-pointer" viewBox="0 0 20 20"
+                    fill="currentColor">
+                    <path fill-rule="evenodd"
+                        d="M9 2a1 1 0 00-.894.553L7.382 4H4a1 1 0 000 2v10a2 2 0 002 2h8a2 2 0 002-2V6a1 1 0 100-2h-3.382l-.724-1.447A1 1 0 0011 2H9zM7 8a1 1 0 012 0v6a1 1 0 11-2 0V8zm5-1a1 1 0 00-1 1v6a1 1 0 102 0V8a1 1 0 00-1-1z"
+                        clip-rule="evenodd" />
+                </svg>
+            </div>
+
         </div>
 
 
     </div>
     @endforeach
+    </div>
+    <div id="notification" class="absolute z-20 text-white bg-green-400 rounded notification bottom-10 right-5">
+        <p id="messagePopup" class="px-2 py-1"></p>
     </div>
     </div>
     <script>
@@ -220,11 +281,16 @@ use App\Models\Device;
                 url: `/luminosity/${Number(e.value)}/${e.dataset.id}`,
             }).then((response) => {
                 e.disabled = false;
-
             });
         }
 
+        function popup(message) {
+            document.getElementById('notification').classList.replace('notification', 'notification');
+            document.getElementById('messagePopup').innerHTML = message;
+        }
+
         function color(e) {
+            // console.log(e.innerHTML);
             window.axios({
                 method: 'POST',
                 url: `/color/${e.value}/${e.dataset.id}`,
@@ -233,6 +299,8 @@ use App\Models\Device;
 
                 console.log(response);
             });
+
+            // popup(`Couleur de la lumière changée en`)
         }
 
         function minimize_opt(opt) {
@@ -254,65 +322,43 @@ use App\Models\Device;
             return min_opt;
         }
 
+        function deleteDevice(e) {
+            let r = confirm('Souhaitez-vous vraiment supprimer ce phériphérique ?')
+
+            if (r == true) {
+                window.axios.post('http://smarthome.test/daikin/');
+            }
+        }
+
+        function targetTemp(id) {
+            let temp = parseFloat(document.getElementById(id).value);
+
+            window.axios.post('http://smarthome.test/daikin/' + document.getElementById(id).dataset.id + '/target_temp/' +
+                    temp)
+                .then(
+                    (r) => {
+                        console.log(r.data);
+                    })
+        }
+
 
         function togglePower(e) {
-            // e.disabled = true;
+            e.disabled = true;
 
             document.getElementById(e.dataset.id + 'Box').classList.replace(e.checked ? 'circle-red' : 'circle-green', e
                 .checked ? 'circle-green' : 'circle-red')
 
-            // var xmlhttp = new XMLHttpRequest();
-            // xmlhttp.onreadystatechange = function() {
-            //     if (xmlhttp.readyState == 4) {
-            //         if (xmlhttp.status == 200) {
-            //             var response = JSON.parse(xmlhttp.responseText);
-            //             console.log('good!');
-            //             control_response = response;
-            //             control_response_handler(response);
-            //         }
-            //     }
-            // };
-
-            // xmlhttp.open("GET", `http://${e.dataset.ip}/aircon/get_control_info`, true);
-            // xmlhttp.setRequestHeader("Content-type", "application/json");
-
-            window.axios.post('http://smarthome.localhost/daikin/' + e.dataset.id + '/power').then(
+            window.axios.post('http://smarthome.test/daikin/' + e.dataset.id + '/power').then(
                 (r) => {
                     console.log(r.data);
                 })
 
-            // console.log(control_response);
-
-            // xmlhttp.send();
-
-            // request = "POST";
-            // target = `/daikin/power/${e.dataset.ip}`;
-            // console.log(e.dataset.po);
-            // console.log(JSON.parse(e.dataset.po));
-            // let temp = minimize_opt(e.dataset.po);
-            // temp.pow == "0" ? 1 : 0;
-
-            // console.log(temp);
-
-            // var xmlhttp = new XMLHttpRequest();
-            // xmlhttp.onreadystatechange = function() {
-            //     if (xmlhttp.readyState == 4) {
-            //         if (xmlhttp.status == 200) {
-            //             var response = JSON.parse(xmlhttp.responseText);
-            //             console.log(response);
-            //         } else {
-            //             console.log("Error: send control request failed");
-            //         }
-            //     } else {
-            //         //alert(xmlhttp.readyState);
-            //     }
-            // };
-
-
-            // xmlhttp.open(request, target, true);
-            // xmlhttp.setRequestHeader("Content-type", "application/json");
-            // xmlhttp.send(JSON.stringify(temp));
+            setTimeout(function() {
+                e.disabled = false;
+            }, (1000));
         }
+
+        popup('grossac');
     </script>
 </body>
 

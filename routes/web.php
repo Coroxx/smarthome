@@ -27,15 +27,16 @@ Route::middleware(['auth'])->group(function () {
     Route::get('/home', 'MainController@index')->name('home');
 
 
-    Route::post('/light/1/{id}', 'MainController@lightOn')->name('light.on');
-    Route::post('/light/0/{id}', 'MainController@lightOff')->name('light.off');
+    Route::post('/light/1/{device}', 'MainController@lightOn')->name('light.on');
+    Route::post('/light/0/{device}', 'MainController@lightOff')->name('light.off');
 
 
     // Route::get('/daikin/{device}', 'DaikinController@sendData')->name('daikin.getinfo');
     Route::post('/daikin/{device}/power', 'DaikinController@togglePower')->name('daikin.power.toggle');
+    Route::post('/daikin/{device}/target_temp/{temp}', 'DaikinController@targetTemp')->name('daikin.temp.target');
 
-    Route::post('/luminosity/{luminosity}/{id}', 'MainController@luminosity');
-    Route::post('/color/{color}/{id}', 'MainController@color');
+    Route::post('/luminosity/{luminosity}/{device}', 'MainController@luminosity');
+    Route::post('/color/{color}/{device}', 'MainController@color');
 
     Route::redirect('/', '/home');
 

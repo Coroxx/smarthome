@@ -12,10 +12,6 @@ class MainController extends Controller
 
     public function index()
     {
-        // $yee = new Yeelight('192.168.0.41', 55443);
-        // dd($yee);
-
-
         $devices = auth()->user()->devices()->get();
 
         $devices->transform(function ($item, $key) {
@@ -26,11 +22,13 @@ class MainController extends Controller
                     if ($status) {
                         try {
                             $item->status = json_decode($status[0])->result[0];
+
+
+                            $bright = $yee->get_prop("bright")->commit();
+                            $item->bright = json_decode($bright[0])->result[0];
+                            $yee->disconnect();
                         } catch (\Throwable $th) {
                         }
-                        $bright = $yee->get_prop("bright")->commit();
-                        $item->bright = json_decode($bright[0])->result[0];
-                        $yee->disconnect();
                     }
                     break;
                 case 'daikin':
@@ -54,16 +52,9 @@ class MainController extends Controller
                     preg_match_all('!\d+!', explode(',', $temp)[3], $matches);
                     $item->current_temp_outside = $matches[0][0] . '.' . $matches[0][1] . '°C';
 
-
-                    // $control_info =  file_get_contents('http://' . $item->ip . '/aircon/get_control_info');
-
-                    // $array = explode(",", $control_info);
-                    // $control_info = array();
-                    // foreach ($array as $value) {
-                    //     $pair = explode("=", $value);
-                    //     $control_info[$pair[0]] = $pair[1];
-                    // }
-                    // $item->data = $control_info;
+                    $settings = file_get_contents('http://' . $item->ip . '/aircon/get_control_info');
+                    preg_match_all('!\d+!', explode(',', $settings)[4], $matches);
+                    $item->current_target_temp = $matches[0][0] . '.' . $matches[0][1];
             }
             return $item;
         });
@@ -73,10 +64,8 @@ class MainController extends Controller
         return view('home', compact('devices'));
     }
 
-    public function lightOn($id)
+    public function lightOn(Device $device)
     {
-
-        $device = Device::findOrFail($id);
 
 
         switch ($device->type) {
@@ -99,10 +88,8 @@ class MainController extends Controller
 
     }
 
-    public function lightOff($id)
+    public function lightOff(Device $device)
     {
-        $device = Device::findOrFail($id);
-
         switch ($device->type) {
             case 'yeelight':
                 $yee = new Yeelight($device->ip, 55443);
@@ -112,9 +99,8 @@ class MainController extends Controller
         }
     }
 
-    public function luminosity($luminosity, $id)
+    public function luminosity($luminosity, Device $device)
     {
-        $device = Device::findOrFail($id);
 
         switch ($device->type) {
             case 'yeelight':
@@ -126,39 +112,9 @@ class MainController extends Controller
         }
     }
 
-    public function clim($ip)
-    {
-        function set_array_info($uri, $aircon_ip, $parameters)
-        {
-            $url = "http://$aircon_ip$uri";
-            $context = stream_context_create(NULL, $parameters);
-            $data = file_get_contents($url . '?' . http_build_query($parameters));
-            if ($data === FALSE) {
-                return FALSE;
-            } else {
-                $array = explode(",", $data);
-                $control_info = array();
-                foreach ($array as $value) {
-                    $pair = explode("=", $value);
-                    $control_info[$pair[0]] = $pair[1];
-                }
-                return json_encode($control_info);
-            }
-        }
 
-        $aRequest = json_decode(file_get_contents('php://input'), true);
-        $json_ret = set_array_info("/aircon/set_control_info", $ip, $aRequest);
-        //request failed
-        if ($json_ret === FALSE) {
-            http_response_code(503); //service Unavailable
-            exit;
-        }
-        print($json_ret);
-    }
-
-    public function color($color, $id)
+    public function color($color, Device $device)
     {
-        $device = Device::findOrFail($id);
 
         switch ($device->type) {
             case 'yeelight':

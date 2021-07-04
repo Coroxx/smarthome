@@ -7,72 +7,40 @@ use Illuminate\Support\Facades\Http;
 
 class DaikinController extends Controller
 {
-
-    public function index()
+    private function parse($string)
     {
-        function get_array_info($uri, $aircon_ip)
-        {
-
-            $url = "http://$aircon_ip$uri";
-            $data = @file_get_contents($url);
-            if ($data === FALSE) {
-                return FALSE;
-            } else {
-                $array = explode(",", $data);
-                $control_info = array();
-                foreach ($array as $value) {
-                    $pair = explode("=", $value);
-                    $control_info[$pair[0]] = $pair[1];
-                }
-            }
-            return $control_info;
-        }
-
-        //retrive infos encoded in JSON format
-        function get_json_info($uri, $aircon_ip)
-        {
-            $array_info = get_array_info($uri, $aircon_ip);
-            if ($array_info === FALSE)
-                return FALSE;
-            return json_encode($array_info);
-        }
-
-
-        function set_array_info($uri, $aircon_ip, $parameters)
-        {
-            $url = "http://$aircon_ip$uri";
-            $context = stream_context_create(NULL, $parameters);
-            $data = file_get_contents($url . '?' . http_build_query($parameters));
-            if ($data === FALSE) {
-                return FALSE;
-            } else {
-                $array = explode(",", $data);
-                $control_info = array();
-                foreach ($array as $value) {
-                    $pair = explode("=", $value);
-                    $control_info[$pair[0]] = $pair[1];
-                }
-                return json_encode($control_info);
-            }
-        }
-        // $aRequest = json_decode(file_get_contents('php://input'), true);
-        // // dd($aRequest);
-        // $json_ret = set_array_info("/aircon/set_control_info", '192.168.0.21', $aRequest);
-        // dd($json_ret);
-    }
-
-    public function togglePower(Device $device)
-    {
-        $response = Http::get('http://' . $device->ip . '/aircon/get_control_info');
-
-        $data = explode(",", $response->body());
+        $data = explode(",", $string->body());
         $control_info = [];
         foreach ($data as $val) {
             $pair = explode("=", $val);
             $control_info[$pair[0]] = $pair[1];
         }
 
+        return $control_info;
+    }
+
+
+    public function togglePower(Device $device)
+    {
+        $response = Http::get('http://' . $device->ip . '/aircon/get_control_info');
+
+        $control_info = $this->parse($response);
         $control_info['pow'] = $control_info['pow'] == 1 ? 0 : 1;
+
+        Http::get('http://' . $device->ip . '/aircon/set_control_info', $control_info);
+    }
+
+    public function targetTemp(Device $device, $temp)
+    {
+        request()->validate([
+            $temp => 'regex:\d+[\.]?\d+'
+        ]);
+
+
+        $response = Http::get('http://' . $device->ip . '/aircon/get_control_info');
+        $control_info = $this->parse($response);
+
+        $control_info['stemp'] = $temp;
 
         Http::get('http://' . $device->ip . '/aircon/set_control_info', $control_info);
     }
