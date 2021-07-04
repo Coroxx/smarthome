@@ -11,7 +11,9 @@ use App\Models\Device;
     <meta http-equiv="refresh" content="200">
 
     <link href="{{ asset('css/app.css') }}" rel="stylesheet">
+    <link href="{{ asset('css/vanillatoasts.css') }}" rel="stylesheet">
     <script src="{{ asset('js/app.js') }}"></script>
+    <script src="{{ asset('js/vanillatoasts.js') }}"></script>
 
 
     <link rel="icon" type="image/png" href="{{ asset('assets/house.png') }}" />
@@ -92,7 +94,7 @@ use App\Models\Device;
             }
 
             100% {
-                display: hidden;
+                display: none;
                 opacity: 0;
             }
 
@@ -100,7 +102,7 @@ use App\Models\Device;
         }
 
         .notification {
-            animation: notification 3s ease-in forwards;
+            animation: notification 5s ease-in forwards;
         }
 
     </style>
@@ -207,8 +209,8 @@ use App\Models\Device;
                         class="px-2 bg-gray-600 rounded outline-none appearance-none focus:outline-none" id="color">
                         <option selected>Sélectionner</option>
                         <option value="16711680">Rouge</option>
-                        <option value="65280">Vert</option>
-                        <option value="255">Bleu</option>
+                        <option value="1441536">Vert</option>
+                        <option value="5631">Bleu</option>
                         <option value="10490623">Violet</option>
                         <option value="16187136">Jaune</option>
                         <option value="16551939">Orange</option>
@@ -254,7 +256,8 @@ use App\Models\Device;
     </div>
     @endforeach
     </div>
-    <div id="notification" class="absolute z-20 text-white bg-green-400 rounded notification bottom-10 right-5">
+    <div id="notification" class="absolute z-20 text-white bg-green-400 rounded bottom-10 right-5"
+        style="display : none ; opacity : 1">
         <p id="messagePopup" class="px-2 py-1"></p>
     </div>
     </div>
@@ -271,7 +274,24 @@ use App\Models\Device;
                 url: `/light/${Number(e.checked)}/${e.dataset.id}`,
             }).then((response) => {
                 e.disabled = false;
-
+                let word = e.checked ? 'allumée' : 'éteinte';
+                if (response.status == 200) {
+                    VanillaToasts.create({
+                        title: 'Mise à jour réussie',
+                        positionClass: 'bottomRight',
+                        type: 'success',
+                        timeout: 3000,
+                        text: `Lumière ${word}`,
+                    });
+                } else {
+                    VanillaToasts.create({
+                        title: 'Oups..',
+                        positionClass: 'bottomRight',
+                        type: 'error',
+                        timeout: 3000,
+                        text: `On dirait qu'une erreur s'est produite...`,
+                    });
+                }
             });
         }
 
@@ -281,16 +301,40 @@ use App\Models\Device;
                 url: `/luminosity/${Number(e.value)}/${e.dataset.id}`,
             }).then((response) => {
                 e.disabled = false;
+
+                if (response.stauts == 200) {
+                    VanillaToasts.create({
+                        title: 'Mise à jour réussie',
+                        positionClass: 'bottomRight',
+                        type: 'success',
+                        timeout: 3000,
+                        text: `Luminositée de la lumière mise sur ${e.value}%`,
+                    });
+                } else {
+                    VanillaToasts.create({
+                        title: 'Oups..',
+                        positionClass: 'bottomRight',
+                        type: 'error',
+                        timeout: 3000,
+                        text: `On dirait qu'une erreur s'est produite...`,
+                    });
+                }
             });
+
+
         }
 
         function popup(message) {
-            document.getElementById('notification').classList.replace('notification', 'notification');
+            document.getElementById('notification').style.display = 'block';
+            document.getElementById('notification').style.animation = 'opacity 4s 2';
             document.getElementById('messagePopup').innerHTML = message;
+
+            setTimeout(function() {
+                document.getElementById('notification').style.display = 'none';
+            }, (1500));
         }
 
         function color(e) {
-            // console.log(e.innerHTML);
             window.axios({
                 method: 'POST',
                 url: `/color/${e.value}/${e.dataset.id}`,
@@ -300,7 +344,19 @@ use App\Models\Device;
                 console.log(response);
             });
 
-            // popup(`Couleur de la lumière changée en`)
+            let color = parseInt(e.value);
+
+            if (color) {
+                VanillaToasts.create({
+                    title: 'Mise à jour réussie',
+                    positionClass: 'bottomRight',
+                    type: 'success',
+                    timeout: 3000,
+                    text: `Couleur de la lumière changée en <div class="relative inline-flex w-4 h-4 rounded left-1 top-1" style="background-color : #${color.toString(16)}"> </div>`,
+                });
+            }
+
+
         }
 
         function minimize_opt(opt) {
@@ -326,19 +382,42 @@ use App\Models\Device;
             let r = confirm('Souhaitez-vous vraiment supprimer ce phériphérique ?')
 
             if (r == true) {
-                window.axios.post('http://smarthome.test/daikin/');
+                window.axios.post('http://smarthome.localhost/daikin/');
             }
         }
 
         function targetTemp(id) {
             let temp = parseFloat(document.getElementById(id).value);
 
-            window.axios.post('http://smarthome.test/daikin/' + document.getElementById(id).dataset.id + '/target_temp/' +
+            window.axios.post('http://smarthome.localhost/daikin/' + document.getElementById(id).dataset.id +
+                    '/target_temp/' +
                     temp)
                 .then(
                     (r) => {
                         console.log(r.data);
+
+                        if (r.status == 200) {
+                            VanillaToasts.create({
+                                title: 'Mise à jour réussie',
+                                positionClass: 'bottomRight',
+                                type: 'success',
+                                timeout: 3000,
+                                text: `Température de l'appareil paramétré sur ${temp}°C`,
+                            });
+
+                        } else {
+                            VanillaToasts.create({
+                                title: 'Oups..',
+                                positionClass: 'bottomRight',
+                                type: 'error',
+                                timeout: 3000,
+                                text: `On dirait qu'une erreur s'est produite...`,
+                            });
+                        }
+
                     })
+
+
         }
 
 
@@ -348,17 +427,33 @@ use App\Models\Device;
             document.getElementById(e.dataset.id + 'Box').classList.replace(e.checked ? 'circle-red' : 'circle-green', e
                 .checked ? 'circle-green' : 'circle-red')
 
-            window.axios.post('http://smarthome.test/daikin/' + e.dataset.id + '/power').then(
+            window.axios.post('http://smarthome.localhost/daikin/' + e.dataset.id + '/power').then(
                 (r) => {
-                    console.log(r.data);
+                    if (r.status == 200) {
+                        let word = e.checked ? 'allumée' : 'éteinte';
+
+                        VanillaToasts.create({
+                            title: 'Mise à jour réussie',
+                            positionClass: 'bottomRight',
+                            type: 'success',
+                            timeout: 3000,
+                            text: `Appareil ${word}`,
+                        });
+                    } else {
+                        VanillaToasts.create({
+                            title: 'Oups..',
+                            positionClass: 'bottomRight',
+                            type: 'error',
+                            timeout: 3000,
+                            text: `On dirait qu'une erreur s'est produite...`,
+                        });
+                    }
                 })
 
             setTimeout(function() {
                 e.disabled = false;
             }, (1000));
         }
-
-        popup('grossac');
     </script>
 </body>
 
