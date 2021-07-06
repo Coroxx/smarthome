@@ -3,6 +3,7 @@
 
 @php
 use App\Models\Device;
+use Illuminate\Support\Facades\Http;
 @endphp
 
 <head>
@@ -121,17 +122,20 @@ use App\Models\Device;
     <div class="w-full h-screen">
         <div class="fadeIn">
             <div class="">
-                <p class="py-4 text-3xl font-extrabold text-center text-gray-200 xl:text-5xl lg:text-4xl font-default">
-                    SmartHome <img src="{{ asset('assets/light.png') }}" alt="emoji"
-                        class="inline w-12 h-12 mb-1 -ml-2">
-                </p>
+                <a href="{{ route('home') }}">
+                    <p
+                        class="py-4 text-3xl font-extrabold text-center text-gray-200 xl:text-5xl lg:text-4xl font-default">
+                        SmartHome <img src="{{ asset('assets/light.png') }}" alt="emoji"
+                            class="inline w-12 h-12 mb-1 -ml-2">
+                    </p>
+                </a>
             </div>
             @yield('content')
 
         </div>
     </div>
 
-    @yield('script')
+    @yield('javascript')
 </body>
 
 </html>

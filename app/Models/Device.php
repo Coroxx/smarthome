@@ -13,7 +13,9 @@ class Device extends Model
         'ip',
         'name',
         'user_id',
-        'type'
+        'type',
+        'username',
+        'password'
     ];
 
     public function users()

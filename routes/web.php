@@ -34,6 +34,10 @@ Route::middleware(['auth'])->group(function () {
         return view('add-device');
     })->name('device.add');
 
+    Route::get('/addProfile', function () {
+        return view('add-profile');
+    })->name('device.profile');
+
     Route::post('/addDevice', 'MainController@createDevice')->name('device.add.post');
 
     Route::post('/delete/{device}', 'MainController@deleteDevice')->name('device.delete');

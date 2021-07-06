@@ -19,7 +19,19 @@ class UsersTableSeeder extends Seeder
         Model::unguard();
 
         User::firstOrCreate([
-            'name' => 'Elliot',
+            'name' => 'Parent',
+            'password' => Hash::make('12345678'),
+            'created_at' => now()
+        ]);
+
+        User::firstOrCreate([
+            'name' => 'Kid1',
+            'password' => Hash::make('12345678'),
+            'created_at' => now()
+        ]);
+
+        User::firstOrCreate([
+            'name' => 'Kid2',
             'password' => Hash::make('12345678'),
             'created_at' => now()
         ]);

@@ -38,7 +38,7 @@ class DaikinController extends Controller
 
         if (intval($temp) > 30) {
             return abort(403);
-        } else if (intval($temp) < 25) {
+        } else if (intval($temp) < 24) {
             return abort(403);
         }
 

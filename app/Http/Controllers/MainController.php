@@ -5,6 +5,8 @@ namespace App\Http\Controllers;
 use App\Helper\Yeelight;
 use App\Helper\Daikin;
 use App\Models\Device;
+use Illuminate\Support\Facades\Http;
+
 
 
 class MainController extends Controller
@@ -12,6 +14,7 @@ class MainController extends Controller
 
     public function index()
     {
+
         $devices = auth()->user()->devices()->get();
 
         $devices->transform(function ($item, $key) {
@@ -55,6 +58,15 @@ class MainController extends Controller
                     $settings = file_get_contents('http://' . $item->ip . '/aircon/get_control_info');
                     preg_match_all('!\d+!', explode(',', $settings)[4], $matches);
                     $item->current_target_temp = $matches[0][0] . '.' . $matches[0][1];
+
+                    break;
+                case 'foscam':
+                    try {
+                        Http::timeout(3)->get($item->ip);
+                        $item->status = 'online';
+                    } catch (\Throwable $th) {
+                    }
+                    break;
             }
             return $item;
         });
@@ -128,6 +140,36 @@ class MainController extends Controller
     public function deleteDevice(Device $device)
     {
         $device->delete();
+
+        return redirect()->route('home');
+    }
+
+    public function createDevice()
+    {
+        request()->validate(
+            [
+                'type' => 'required|string',
+                'name' => 'string|required|max:25|min:3',
+                'ip' => 'regex:^[0-9.:]*$^|string',
+                'username' => 'string|nullable',
+                'password' => 'string|nullable'
+            ],
+            [
+                'type.required' => 'Vous devez sélectionner un type d\'appareil',
+                'name.max' => 'Le nom ne peut pas dépasser les 25 caractères',
+                'name.min' => 'Le nom doit faire au moins 3 caractères',
+            ]
+        );
+
+
+        Device::create([
+            'name' => request()->name,
+            'ip' => request()->ip,
+            'type' => request()->type,
+            'user_id' => auth()->user()->id,
+            'username' => request()->username,
+            'password' => request()->password
+        ]);
 
         return redirect()->route('home');
     }

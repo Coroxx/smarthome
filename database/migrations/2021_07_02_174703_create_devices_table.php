@@ -17,7 +17,9 @@ class CreateDevicesTable extends Migration
             $table->id();
             $table->string('name');
             $table->string('type');
-            $table->string('ip')->nullabe();
+            $table->string('username')->nullable();
+            $table->string('password')->nullable();
+            $table->string('ip');
             $table->integer('user_id');
             $table->timestamps();
         });

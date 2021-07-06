@@ -7,15 +7,18 @@
 
 @section('content')
 
-    <div class="mb-10">
-        <div class="px-1 py-1 m-auto text-center text-black bg-gray-300 rounded w-44">
-            <a href="{{ route('device.add') }}"> Ajouter un appareil + </a>
+    <div class="justify-center m-auto mb-10 text-center">
+        <div class="inline px-1 py-1 pl-2 m-auto mr-2 text-center text-black bg-gray-300 rounded w-44">
+            <a href="{{ route('device.add') }}"> Ajouter un appareil +</a>
+        </div>
+        <div class="inline w-auto px-1 py-1 m-auto text-center text-black bg-gray-300 rounded">
+            <a href="{{ route('device.profile') }}"> Gérer mes automatisations </a>
         </div>
     </div>
     <div class="grid grid-cols-1 gap-12 pb-4 mx-8 mt-4 text-center text-white xl:grid-cols-3 lg:grid-cols-2">
         @foreach ($devices as $device)
-        <div class="relative px-4 pt-2 bg-gray-800 border-b-4 @if ($device->type == 'yeelight') border-yellow-300 @elseif($device->type =='daikin')
-                border-blue-500 @endif rounded">
+        <div class="relative px-4 pt-2 bg-gray-800 border-b-4 @if ($device->type == 'yeelight') border-pink-700 @elseif($device->type =='daikin')
+            border-blue-500 @elseif($device->type =='foscam') border-green-500 @endif rounded">
                 <div class="text-left">
                     @switch($device->type)
                         @case('yeelight')
@@ -33,6 +36,13 @@
                             </svg>
 
                         @break
+                        @case('foscam')
+                            <svg xmlns="http://www.w3.org/2000/svg" class="inline-flex w-8 h-8 ml-2" fill="none"
+                                viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                    d="M15 10l4.553-2.276A1 1 0 0121 8.618v6.764a1 1 0 01-1.447.894L15 14M5 18h8a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z" />
+                            </svg>
+                        @break
                         @default
 
                     @endswitch
@@ -40,11 +50,43 @@
 
                     <p class="relative inline-flex text-xl top-1">{{ $device->name }}</p>
                     @if ($device->status)
-                        <div class="relative inline-flex top-2 left-0.5">
-                            <div class="@if ($device->status == 'on') circle-green
-                            @else circle-red @endif" id="{{ $device->id . 'Box' }}"></div>
-                        </div>
+                        @if ($device->status == 'on' || $device->status == 'off')
+                            <div class="relative inline-flex top-2 left-0.5">
+                                <div class="@if ($device->status == 'on') circle-green
+                                @else circle-red @endif" id="{{ $device->id . 'Box' }}"></div>
+                            </div>
 
+                        @elseif($device->status == 'online')
+                            <div>
+                                <p class="ml-2.5 font-bold text-green-500">Connexion établie</p>
+                            </div>
+
+                            @php
+                                try {
+                                    $data = Http::get("http://$device->ip/cgi-bin/CGIProxy.fcgi?usr=$device->username&pwd=$device->password&cmd=setSubStreamFormat&format=1");
+                                    if (strstr($data->body(), '0')) {
+                                        $response = true;
+                                    } else {
+                                        $response = null;
+                                    }
+                                } catch (\Throwable $th) {
+                                    $response = null;
+                                }
+                            @endphp
+
+                            @if ($response)
+
+                                <div class="mt-8 text-lg text-center">
+                                    <a href="http://{{ $device->ip }}/cgi-bin/CGIStream.cgi?cmd=GetMJStream&usr={{ $device->username }}&pwd={{ $device->password }}"
+                                        class="px-3 py-1.5 bg-gray-700 rounded" target="_blank" mt-2">Visionner le flux</a>
+                                </div>
+
+                            @else
+                                <div class="px-2 mt-6 font-bold text-center">
+                                    <p class="text-red-500">Les informations de connexions semblent être éronnées</p>
+                                </div>
+                            @endif
+                        @endif
                     @else
                         <div>
                             <p class="ml-2 font-bold text-red-600">Hors ligne</p>
@@ -57,14 +99,22 @@
                             <input type="checkbox" data-id="{{ $device->id }}" @if ($device->type == 'yeelight') onclick="toggleLight(this)" @elseif($device->type == 'daikin') onclick="togglePower(this)" @endif class="sr-only" @if ($device->status)
                             @if ($device->status === 'on')
                             checked @endif @else disabled
-        @endif />
-        <div class="w-10 h-4 bg-gray-400 rounded-full shadow-inner"></div>
-        <div class="absolute w-6 h-6 transition bg-white rounded-full shadow dot -left-1 -top-1">
-        </div>
+        @endif/>
+
+        @if ($device->type != 'foscam')
+            <div class="w-10 h-4 bg-gray-400 rounded-full shadow-inner"></div>
+            <div class="absolute w-6 h-6 transition bg-white rounded-full shadow dot -left-1 -top-1">
+            </div>
     </div>
+
     <div class="ml-3 text-lg font-bold text-white">
         Allumer
     </div>
+@else
+
+    </div>
+    @endif
+
 
     </label>
     @if ($device->type == 'yeelight')
@@ -260,7 +310,7 @@
             function deleteDevice(e) {
                 let r = confirm('Souhaitez-vous vraiment supprimer ce phériphérique ?')
                 if (r == true) {
-                    window.axios.post(`http://smarthome.localhost/delete/${e.dataset.id}`).then((r) => {
+                    window.axios.post(`http://smarthome.test/delete/${e.dataset.id}`).then((r) => {
                         if (r.status == 200) {
                             VanillaToasts.create({
                                 title: 'Opération réussie',
@@ -281,7 +331,7 @@
                 let temp = parseFloat(document.getElementById(id).value);
 
 
-                window.axios.post('http://smarthome.localhost/daikin/' + document.getElementById(id).dataset.id +
+                window.axios.post('http://smarthome.test/daikin/' + document.getElementById(id).dataset.id +
                         '/target_temp/' +
                         temp)
                     .then(
@@ -314,7 +364,7 @@
                                 positionClass: 'bottomRight',
                                 type: 'error',
                                 timeout: 3000,
-                                text: `Veuillez entrer une température entre 25°C et 30°C`,
+                                text: `Veuillez entrer une température entre 24°C et 30°C`,
                             });
                         }
                     )
@@ -327,7 +377,7 @@
                 document.getElementById(e.dataset.id + 'Box').classList.replace(e.checked ? 'circle-red' : 'circle-green', e
                     .checked ? 'circle-green' : 'circle-red')
 
-                window.axios.post('http://smarthome.localhost/daikin/' + e.dataset.id + '/power').then(
+                window.axios.post('http://smarthome.test/daikin/' + e.dataset.id + '/power').then(
                     (r) => {
                         if (r.status == 200) {
                             let word = e.checked ? 'allumé' : 'éteint';
@@ -356,3 +406,4 @@
             }
         </script>
     @endsection
+    {{-- @endsection --}}
