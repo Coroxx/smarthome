@@ -58,15 +58,4 @@
 
 
 @section('javascript')
-    {{-- <script>
-        window.axios({
-            // method: 'POST',
-            url: `http://192.168.0.16:8080/#/LightSwitches/json.htm?type=command&param=switchlight&idx=5&switchcmd=On&level=0`,
-            async: false,
-            dataType: 'json',
-        }).then((response) => {
-            console.log(response);
-            console.log(response.data);
-        });
-    </script> --}}
 @endsection
