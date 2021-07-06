@@ -310,7 +310,7 @@
             function deleteDevice(e) {
                 let r = confirm('Souhaitez-vous vraiment supprimer ce phériphérique ?')
                 if (r == true) {
-                    window.axios.post(`http://smarthome.localhost/delete/${e.dataset.id}`).then((r) => {
+                    window.axios.post(`http://smarthome.test/delete/${e.dataset.id}`).then((r) => {
                         if (r.status == 200) {
                             VanillaToasts.create({
                                 title: 'Opération réussie',
@@ -331,7 +331,7 @@
                 let temp = parseFloat(document.getElementById(id).value);
 
 
-                window.axios.post('http://smarthome.localhost/daikin/' + document.getElementById(id).dataset.id +
+                window.axios.post('http://smarthome.test/daikin/' + document.getElementById(id).dataset.id +
                         '/target_temp/' +
                         temp)
                     .then(
@@ -377,7 +377,7 @@
                 document.getElementById(e.dataset.id + 'Box').classList.replace(e.checked ? 'circle-red' : 'circle-green', e
                     .checked ? 'circle-green' : 'circle-red')
 
-                window.axios.post('http://smarthome.localhost/daikin/' + e.dataset.id + '/power').then(
+                window.axios.post('http://smarthome.test/daikin/' + e.dataset.id + '/power').then(
                     (r) => {
                         if (r.status == 200) {
                             let word = e.checked ? 'allumé' : 'éteint';
