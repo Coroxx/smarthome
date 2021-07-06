@@ -8,7 +8,7 @@ use Illuminate\Support\Facades\Http;
 
 <head>
     <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, minimum-scale=1.0" />
     @yield('meta-tag')
 
     <link href="{{ asset('css/app.css') }}" rel="stylesheet">
@@ -126,7 +126,7 @@ use Illuminate\Support\Facades\Http;
                     <p
                         class="py-4 text-3xl font-extrabold text-center text-gray-200 xl:text-5xl lg:text-4xl font-default">
                         SmartHome <img src="{{ asset('assets/light.png') }}" alt="emoji"
-                            class="inline w-12 h-12 mb-1 -ml-2">
+                            class="inline w-10 h-10 mb-2 -ml-2 lg:w-12 lg:h-12">
                     </p>
                 </a>
             </div>

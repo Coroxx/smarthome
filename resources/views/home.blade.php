@@ -11,7 +11,7 @@
         <div class="inline px-1 py-1 pl-2 m-auto mr-2 text-center text-black bg-gray-300 rounded w-44">
             <a href="{{ route('device.add') }}"> Ajouter un appareil +</a>
         </div>
-        <div class="inline w-auto px-1 py-1 m-auto text-center text-black bg-gray-300 rounded">
+        <div class="px-1 py-1 pl-2 m-auto mt-6 text-center text-black bg-gray-300 rounded w-52 md:mt-0 md:inline">
             <a href="{{ route('device.profile') }}"> Gérer mes automatisations </a>
         </div>
     </div>
