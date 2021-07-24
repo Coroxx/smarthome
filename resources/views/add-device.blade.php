@@ -5,6 +5,10 @@
 
 @section('content')
     <div class="pb-4">
+        <noscript>
+            <div class="py-2 text-xl font-bold text-red-500">Javascript est désactivé ! Veuillez le réactiver pour que le
+                site fonctionne correctement</div>
+        </noscript>
 
         <div class="w-11/12 h-auto pb-4 m-auto text-center text-white bg-gray-800 rounded lg:text-lg lg:w-9/12">
             <form action="{{ route('device.add.post') }}" method="POST">

@@ -7,9 +7,6 @@ La version 1 ne possède que trois modules
 - Daikin (Climatisation)
 - Foscam (Caméra ip)
 
-La prochaine version sera accompagnée d'un système d'automatisation et probablement d'autres modules
-
-
 # Gérez vos appareils depuis une interface minimaliste et optimisée 🎨
 
 ![alt text](https://i.ibb.co/58xgXh7/image-2021-07-06-182927.png)
@@ -46,3 +43,11 @@ Vous pouvez désormais basculer le fichier en mode production avec
 yarn
 yarn run prod
 ```
+
+**Vous pouvez désormais automatiser les actions avec la climatisation et la lumière**
+
+Attention ⚠️ :
+
+https://www.jdsoftvera.com/how-to-add-laravel-task-schedule-on-windows/
+
+Et il faut configurer Cron pour Linux.

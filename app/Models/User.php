@@ -31,8 +31,13 @@ class User extends Authenticatable
     ];
 
 
-    public function devices(){
+    public function devices()
+    {
         return $this->hasMany('App\Models\Device');
     }
 
+    public function tasks()
+    {
+        return $this->hasMany('App\Models\Task');
+    }
 }

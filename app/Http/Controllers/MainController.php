@@ -7,14 +7,10 @@ use App\Helper\Daikin;
 use App\Models\Device;
 use Illuminate\Support\Facades\Http;
 
-
-
 class MainController extends Controller
 {
-
     public function index()
     {
-
         $devices = auth()->user()->devices()->get();
 
         $devices->transform(function ($item, $key) {
@@ -38,13 +34,13 @@ class MainController extends Controller
                     try {
                         $data = file_get_contents('http://' . $item->ip . '/common/basic_info');
                     } catch (\Throwable $th) {
-                        $item->status = False;
+                        $item->status = false;
 
                         return $item;
                     }
                     if (explode(',', $data)[6] == 'pow=0') {
                         $item->status = 'off';
-                    } else if (explode(',', $data)[6] == 'pow=1') {
+                    } elseif (explode(',', $data)[6] == 'pow=1') {
                         $item->status = 'on';
                     }
 
@@ -78,8 +74,6 @@ class MainController extends Controller
 
     public function lightOn(Device $device)
     {
-
-
         switch ($device->type) {
             case 'yeelight':
                 $yee = new Yeelight($device->ip, 55443);
@@ -87,17 +81,6 @@ class MainController extends Controller
                 $yee->commit();
                 $yee->disconnect();
         }
-
-        // $yee->set_rgb(0xFF0000); // color to red
-        // $yee->set_bright(50); // brightness to 50%
-
-
-        // sleep(10);
-        // $yee->set_rgb(0x00FF00)->set_bright(100)->commit(); // calls return the object for fast chaining of commands
-
-        // $status = $yee->get_prop("power")->commit(); // get current status
-        // print_r($status);
-
     }
 
     public function lightOff(Device $device)
@@ -113,7 +96,6 @@ class MainController extends Controller
 
     public function luminosity($luminosity, Device $device)
     {
-
         switch ($device->type) {
             case 'yeelight':
                 $yee = new Yeelight($device->ip, 55443);
@@ -127,7 +109,6 @@ class MainController extends Controller
 
     public function color($color, Device $device)
     {
-
         switch ($device->type) {
             case 'yeelight':
                 $yee = new Yeelight($device->ip, 55443);

@@ -13,3 +13,7 @@ host = str(
 for line in fileinput.input("resources/views/home.blade.php"):
     tempFile.write(line.replace("http://smarthome.localhost", host))
 tempFile.close()
+
+for line in fileinput.input("resources/views/add-profile.blade.php"):
+    tempFile.write(line.replace("http://smarthome.localhost", host))
+tempFile.close()

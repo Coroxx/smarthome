@@ -34,9 +34,9 @@ Route::middleware(['auth'])->group(function () {
         return view('add-device');
     })->name('device.add');
 
-    Route::get('/addProfile', function () {
-        return view('add-profile');
-    })->name('device.profile');
+    Route::get('/addProfile', 'AutomatizationController@index')->name('device.profile');
+    Route::post('/addProfile', 'AutomatizationController@create')->name('device.profile.add');
+    Route::post('/task/delete/{id}', 'AutomatizationController@delete')->name('device.profile.remove');
 
     Route::post('/addDevice', 'MainController@createDevice')->name('device.add.post');
 
