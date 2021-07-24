@@ -24,30 +24,10 @@ Libre à vous d'ajouter des utilisateurs ou de modifier leurs mots de passes (ha
 ![alt text](https://i.ibb.co/vZh42n3/image-2021-07-06-183600.png)
 
 
+<h1> <strong> Vous pouvez désormais automatiser les actions avec la climatisation et la lumière </strong> </h1>
 
-# Avant de basculer le projet en mode production, lancez le fichier python :
+<h2> Attention ⚠️ : </h2>
 
+<h3>https://www.jdsoftvera.com/how-to-add-laravel-task-schedule-on-windows/ </h3>
 
-```
-python3 deploy.py
-```
-
-Et indiquez l'url de votre projet, par exemple si vous l'hébergez localement sur un serveur, 
-http://ipduserveur
-Ou si vous avez un dns
-https://domaine.com
-
-Vous pouvez désormais basculer le fichier en mode production avec 
-
-```
-yarn
-yarn run prod
-```
-
-**Vous pouvez désormais automatiser les actions avec la climatisation et la lumière**
-
-Attention ⚠️ :
-
-https://www.jdsoftvera.com/how-to-add-laravel-task-schedule-on-windows/
-
-Et il faut configurer Cron pour Linux.
+Et il faut configurer Cron si vous l'hébergez sur un serveur Linux.

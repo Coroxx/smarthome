@@ -152,15 +152,17 @@
                             text-red-500 @endif">
                         @if ($task->action == '1') Allumer à @else Éteindre à
                                 @endif {{ $task->date }} @if (strlen($task->days) == 50)
-                                    Toute la semaine @else le @if (stristr($task->days, 'Monday')) Lundi @endif @if (stristr($task->days, 'Tuesday')) Mardi @endif @if (stristr($task->days, 'Wednesday')) Mercredi @endif
-                                                @if (stristr($task->days, 'Thursday'))
-                                                    Jeudi
-                                                    @endif @if (stristr($task->days, 'Friday'))
-                                                        Vendredi @endif @if (stristr($task->days, 'Saturday')) Samedi
-                                                        @endif
-                                                        @if (stristr($task->days, 'Sunday')) Dimanche
-                                                        @endif
+                                    Toute la semaine @else le @if (stristr($task->days, 'Monday')) Lundi @endif @if (stristr($task->days, 'Tuesday')) Mardi @endif @if (stristr($task->days, 'Wednesday')) Mercredi
+                                            @endif
+                                            @if (stristr($task->days, 'Thursday'))
+                                                Jeudi
+                                                @endif @if (stristr($task->days, 'Friday'))
+                                                    Vendredi @endif @if (stristr($task->days, 'Saturday')) Samedi
                                                     @endif
+                                                    @if (stristr($task->days, 'Sunday'))
+                                                        Dimanche
+                                                    @endif
+                                                @endif
                         </p>
                         <div onclick="deleteTask(this)" data-id="{{ $task->id }}">
                             <svg xmlns="http://www.w3.org/2000/svg"
@@ -182,10 +184,12 @@
 
 @section('javascript')
     <script>
+        let url = window.location.href.match('^(?:https?:\/\/)?(?:[^@\n]+@)?(?:www\.)?([^:\/\n?]+)')[0]
+
         function deleteTask(e) {
             let r = confirm('Souhaitez-vous vraiment supprimer cette automatisation ?')
             if (r == true) {
-                window.axios.post(`http://smarthome.test/task/delete/${e.dataset.id}`).then((r) => {
+                window.axios.post(url + `/task/delete/${e.dataset.id}`).then((r) => {
                     if (r.status == 200) {
                         VanillaToasts.create({
                             title: 'Opération réussie',
