@@ -28,7 +28,7 @@ class Kernel extends ConsoleKernel
      * @return void
      */
 
-    
+
     protected function schedule(Schedule $schedule)
     {
         $schedule->call(function () {
@@ -36,6 +36,9 @@ class Kernel extends ConsoleKernel
 
             if ($tasks) {
                 foreach ($tasks as $task) {
+                    if (User::find($task->user_id)->vacation == 1) {
+                        return;
+                    }
                     if (!stristr($task->days, date('l'))) {
                         continue;
                     }
@@ -51,7 +54,7 @@ class Kernel extends ConsoleKernel
                                     $pair = explode("=", $val);
                                     $control_info[$pair[0]] = $pair[1];
                                 }
-                        
+
                                 return $control_info;
                             }
 

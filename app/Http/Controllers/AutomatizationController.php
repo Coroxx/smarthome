@@ -12,6 +12,8 @@ class AutomatizationController extends Controller
 {
     public function index()
     {
+        $vacationMode = auth()->user()->vacation;
+
         $devices = auth()->user()->devices()->get();
 
         $tasks = auth()->user()->tasks()->get();
@@ -23,9 +25,9 @@ class AutomatizationController extends Controller
             return $item;
         });
 
-        return view('add-profile', compact('devices', 'tasks'));
+        return view('add-profile', compact('devices', 'tasks', 'vacationMode'));
     }
-    
+
     public function create()
     {
         request()->validate([

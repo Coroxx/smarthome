@@ -142,7 +142,27 @@
 
             </form>
         </div>
-        <div>
+        <div class="w-9/12 m-auto mt-3">
+            <div class="pl-2.5 mt-2 w-full mb-12">
+                <label class="flex items-center cursor-pointer">
+                    <div class="relative">
+                        <input type="checkbox" onclick="vacationMode(this)" @if ($vacationMode) checked @endif class="sr-only" />
+                        <div class="w-10 h-4 bg-gray-400 rounded-full shadow-inner"></div>
+                        <div class="absolute w-6 h-6 transition bg-white rounded-full shadow dot -left-1 -top-1">
+                        </div>
+                    </div>
+
+                    <div class="ml-3 text-lg font-bold text-white">
+                        Mode vacance<svg xmlns="http://www.w3.org/2000/svg" class="inline-flex ml-1.5 -mt-1.5 h-6 w-6"
+                            fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z" />
+                        </svg>
+                    </div>
+            </div>
+        </div>
+
+        <div class="-mt-6">
             @foreach ($tasks as $task)
                 <div class="w-9/12 rounded text-white h-auto m-auto my-4 bg-gray-800">
                     <div>
@@ -150,9 +170,12 @@
                         <p class="px-2 ml-0.5 inline font-bold @if ($task->action == '1') text-green-500
                         @else
                             text-red-500 @endif">
-                        @if ($task->action == '1') Allumer à @else Éteindre à
+                        @if ($task->action == '1') Allumer à @else Éteindre
+                                à
                                 @endif {{ $task->date }} @if (strlen($task->days) == 50)
-                                    Toute la semaine @else le @if (stristr($task->days, 'Monday')) Lundi @endif @if (stristr($task->days, 'Tuesday')) Mardi @endif @if (stristr($task->days, 'Wednesday')) Mercredi
+                                    Toute la semaine @else le @if (stristr($task->days, 'Monday')) Lundi @endif @if (stristr($task->days, 'Tuesday')) Mardi
+                                            @endif @if (stristr($task->days, 'Wednesday'))
+                                                Mercredi
                                             @endif
                                             @if (stristr($task->days, 'Thursday'))
                                                 Jeudi
@@ -204,6 +227,11 @@
                     }
                 });
             }
+        }
+
+
+        function vacationMode(e) {
+
         }
     </script>
 

@@ -21,19 +21,22 @@ class UsersTableSeeder extends Seeder
         User::firstOrCreate([
             'name' => 'Parent',
             'password' => Hash::make('12345678'),
-            'created_at' => now()
+            'created_at' => now(),
+            'vacation' => false,
         ]);
 
         User::firstOrCreate([
             'name' => 'Kid1',
             'password' => Hash::make('12345678'),
-            'created_at' => now()
+            'created_at' => now(),
+            'vacation' => false,
         ]);
 
         User::firstOrCreate([
             'name' => 'Kid2',
             'password' => Hash::make('12345678'),
-            'created_at' => now()
+            'created_at' => now(),
+            'vacation' => false,
         ]);
     }
 }
