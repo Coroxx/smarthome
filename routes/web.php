@@ -27,6 +27,9 @@ Route::middleware(['auth'])->group(function () {
     Route::get('/home', 'MainController@index')->name('home');
 
 
+    Route::post('/vacation/{bool}', 'MainController@vacation')->name('vacation.mode');
+
+
     Route::post('/light/1/{device}', 'MainController@lightOn')->name('light.on');
     Route::post('/light/0/{device}', 'MainController@lightOff')->name('light.off');
 

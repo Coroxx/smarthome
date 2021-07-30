@@ -8,7 +8,7 @@
     <div class="pb-4">
         @if (session('success') || $errors->any())
             <div class="w-9/12 m-auto mb-4 @if (session('success')) bg-green-600  @else bg-red-500 @endif rounded">
-                <p class="font-bold text-lg text-center text-white">
+                <p class="text-lg font-bold text-center text-white">
                     @if (session('success')) {{ session('success') }}
                     @elseif($errors->any()) {{ $errors->first() }} @endif
                 </p>
@@ -114,25 +114,25 @@
                     <br>
                     <br>
                     <label for="monday">Lundi</label>
-                    <input type="checkbox" class="checked:bg-blue-600 rounded checked:border-transparent text-gray-600"
+                    <input type="checkbox" class="text-gray-600 rounded checked:bg-blue-600 checked:border-transparent"
                         id="monday" style="position : relative ; top : 0.5px" name="Monday">
                     <label for="Tuesday">Mardi</label>
-                    <input type="checkbox" class="checked:bg-blue-600 rounded checked:border-transparent text-gray-600"
+                    <input type="checkbox" class="text-gray-600 rounded checked:bg-blue-600 checked:border-transparent"
                         id="Tuesday" style="position : relative ; top : 0.5px" name="Tuesday">
                     <label for="Wednesday">Mercredi</label>
-                    <input type="checkbox" class="checked:bg-blue-600 rounded checked:border-transparent text-gray-600"
+                    <input type="checkbox" class="text-gray-600 rounded checked:bg-blue-600 checked:border-transparent"
                         id="Wednesday" style="position : relative ; top : 0.5px" name="Wednesday">
                     <label for="Thursday">Jeudi</label>
-                    <input type="checkbox" class="checked:bg-blue-600 rounded checked:border-transparent text-gray-600"
+                    <input type="checkbox" class="text-gray-600 rounded checked:bg-blue-600 checked:border-transparent"
                         id="Thursday" style="position : relative ; top : 0.5px" name="Thursday">
                     <label for="Friday">Vendredi</label>
-                    <input type="checkbox" class="checked:bg-blue-600 rounded checked:border-transparent text-gray-600"
+                    <input type="checkbox" class="text-gray-600 rounded checked:bg-blue-600 checked:border-transparent"
                         id="Friday" style="position : relative ; top : 0.5px" name="Friday">
                     <label for="Saturday">Samedi</label>
-                    <input type="checkbox" class="checked:bg-blue-600 rounded checked:border-transparent text-gray-600"
+                    <input type="checkbox" class="text-gray-600 rounded checked:bg-blue-600 checked:border-transparent"
                         id="Saturday" style="position : relative ; top : 0.5px" name="Saturday">
-                    <label for="Sunday">Samedi</label>
-                    <input type="checkbox" class="checked:bg-blue-600 rounded checked:border-transparent text-gray-600"
+                    <label for="Sunday">Dimanche</label>
+                    <input type="checkbox" class="text-gray-600 rounded checked:bg-blue-600 checked:border-transparent"
                         id="Sunday" style="position : relative ; top : 0.5px" name="Sunday">
                 </div>
 
@@ -146,7 +146,7 @@
             <div class="pl-2.5 mt-2 w-full mb-12">
                 <label class="flex items-center cursor-pointer">
                     <div class="relative">
-                        <input type="checkbox" onclick="vacationMode(this)" @if ($vacationMode) checked @endif class="sr-only" />
+                        <input type="checkbox" id="checkbox" onclick="vacationMode(this)" @if ($vacationMode) checked @endif class="sr-only" />
                         <div class="w-10 h-4 bg-gray-400 rounded-full shadow-inner"></div>
                         <div class="absolute w-6 h-6 transition bg-white rounded-full shadow dot -left-1 -top-1">
                         </div>
@@ -164,9 +164,9 @@
 
         <div class="-mt-6">
             @foreach ($tasks as $task)
-                <div class="w-9/12 rounded text-white h-auto m-auto my-4 bg-gray-800">
+                <div class="w-9/12 h-auto m-auto my-4 text-white bg-gray-800 rounded">
                     <div>
-                        <p class="px-2 text-lg py-2">{{ $task->device_name }}</p>
+                        <p class="px-2 py-2 text-lg">{{ $task->device_name }}</p>
                         <p class="px-2 ml-0.5 inline font-bold @if ($task->action == '1') text-green-500
                         @else
                             text-red-500 @endif">
@@ -189,7 +189,7 @@
                         </p>
                         <div onclick="deleteTask(this)" data-id="{{ $task->id }}">
                             <svg xmlns="http://www.w3.org/2000/svg"
-                                class="inline float-right relative right-1 cursor-pointer -top-6 h-5 w-5"
+                                class="relative inline float-right w-5 h-5 cursor-pointer right-1 -top-6"
                                 viewBox="0 0 20 20" fill="red">
                                 <path fill-rule="evenodd"
                                     d="M9 2a1 1 0 00-.894.553L7.382 4H4a1 1 0 000 2v10a2 2 0 002 2h8a2 2 0 002-2V6a1 1 0 100-2h-3.382l-.724-1.447A1 1 0 0011 2H9zM7 8a1 1 0 012 0v6a1 1 0 11-2 0V8zm5-1a1 1 0 00-1 1v6a1 1 0 102 0V8a1 1 0 00-1-1z"
@@ -208,6 +208,7 @@
 @section('javascript')
     <script>
         let url = window.location.href.match('^(?:https?:\/\/)?(?:[^@\n]+@)?(?:www\.)?([^:\/\n?]+)')[0]
+        let target
 
         function deleteTask(e) {
             let r = confirm('Souhaitez-vous vraiment supprimer cette automatisation ?')
@@ -229,9 +230,20 @@
             }
         }
 
-
         function vacationMode(e) {
-
+            e.checked ? target = url + '/vacation/1' : target = url + '/vacation/0';
+            window.axios.post(target).then((r) => {
+                console.log(r);
+                if (r.status == 200) {
+                    VanillaToasts.create({
+                        title: 'Opération réussie',
+                        positionClass: 'bottomRight',
+                        type: 'info',
+                        timeout: 3000,
+                        text: `Le mode vacance a été correctement mis à jour.`,
+                    });
+                }
+            });
         }
     </script>
 

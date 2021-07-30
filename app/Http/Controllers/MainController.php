@@ -154,4 +154,17 @@ class MainController extends Controller
 
         return redirect()->route('home');
     }
+
+    public function vacation($bool)
+    {
+        if ($bool == 1) {
+            auth()->user()->vacation = true;
+        } else if ($bool == 0) {
+            auth()->user()->vacation = false;
+        }
+
+        auth()->user()->save();
+
+        return;
+    }
 }
