@@ -18,7 +18,8 @@
     </div>
     <div class="grid grid-cols-1 gap-12 pb-4 mx-8 mt-4 text-center text-white xl:grid-cols-3 lg:grid-cols-2">
         @foreach ($devices as $device)
-        <div class="relative px-4 pt-2 bg-gray-800 border-b-4 @if ($device->type == 'yeelight') border-pink-700 @elseif($device->type =='daikin')
+            <div class="relative px-4 pt-2 bg-gray-800 border-b-4  @if ($device->type ==
+            'yeelight') border-pink-700 @elseif($device->type =='daikin')
             border-blue-500 @elseif($device->type =='foscam') border-green-500 @endif rounded">
                 <div class="text-left">
                     @switch($device->type)
@@ -53,7 +54,7 @@
                     @if ($device->status)
                         @if ($device->status == 'on' || $device->status == 'off')
                             <div class="relative inline-flex top-2 left-0.5">
-                                <div class="@if ($device->status == 'on') circle-green
+                                <div class=" @if ($device->status == 'on') circle-green
                                 @else circle-red @endif" id="{{ $device->id . 'Box' }}"></div>
                             </div>
 
@@ -97,7 +98,8 @@
                 <div class="pl-2.5 mt-2 w-full mb-12">
                     <label class="flex items-center cursor-pointer">
                         <div class="relative">
-                            <input type="checkbox" data-id="{{ $device->id }}" @if ($device->type == 'yeelight') onclick="toggleLight(this)" @elseif($device->type == 'daikin') onclick="togglePower(this)" @endif class="sr-only" @if ($device->status)
+                            <input type="checkbox" data-id="{{ $device->id }}" @if ($device->type == 'yeelight') onclick="toggleLight(this)" @elseif($device->type == 'daikin') onclick="togglePower(this)" @endif class="sr-only"
+                                @if ($device->status)
                             @if ($device->status === 'on')
                             checked @endif @else disabled
         @endif/>
@@ -313,7 +315,7 @@
             function deleteDevice(e) {
                 let r = confirm('Souhaitez-vous vraiment supprimer ce phériphérique ?')
                 if (r == true) {
-                    window.axios.post(url + `delete/${e.dataset.id}`).then((r) => {
+                    window.axios.post(url + `/delete/${e.dataset.id}`).then((r) => {
                         if (r.status == 200) {
                             VanillaToasts.create({
                                 title: 'Opération réussie',
